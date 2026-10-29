@@ -1,0 +1,37 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FunkoApi.Models;
+
+public class Funko {
+    
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public long Id { get; set; }
+    
+    [Required]
+    [MaxLength(100)]
+    public string Nombre { get; set; } = string.Empty;
+    
+    // el required no sirve de nada puesto que al ser decimal la columna ya es NOT NULL
+    // el precio no negativo se garantiza en AppDbContext
+    public decimal Precio { get; set; }
+    
+    [Required]
+    public int Stock { get; set; }
+    
+    public string? Imagen { get; set; }
+    
+    [Required]
+    public string CategoriaId { get; set; } = string.Empty;
+
+    public Categoria Categoria { get; set; } = null!;
+    
+    [Required]
+    public string ProveedorId { get; set; } = string.Empty;
+    
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+}
