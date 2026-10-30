@@ -15,6 +15,7 @@ public class Funko {
     
     // el required no sirve de nada puesto que al ser decimal la columna ya es NOT NULL
     // el precio no negativo se garantiza en AppDbContext
+    [Range(0.01, 999999.99, ErrorMessage = "El precio debe estar entre 0.01 y 9999.99")]
     public decimal Precio { get; set; }
     
     [Required]
@@ -30,6 +31,7 @@ public class Funko {
     [Required]
     public string ProveedorId { get; set; } = string.Empty;
     
+    // metadatos
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public bool IsDeleted { get; set; }
