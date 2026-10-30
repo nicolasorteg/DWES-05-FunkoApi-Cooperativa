@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using FunkoApi.IdGenerators;
 
 namespace FunkoApi.Models;
 
@@ -7,7 +8,8 @@ public class Categoria {
 
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)] // no es autoincremental
-    public string Id { get; set; } = string.Empty;
+    [YouTubeId]
+    public string Id { get; set; } = null!;
 
     [Required] 
     [MaxLength(100)] 
