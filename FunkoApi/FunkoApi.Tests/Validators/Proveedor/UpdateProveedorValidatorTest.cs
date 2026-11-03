@@ -34,12 +34,11 @@ public abstract class UpdateProveedorValidatorTest
             result.ShouldNotHaveAnyValidationErrors();
         }
 
-        [TestCase(null)]
         [TestCase("")]
         public void Validar_TelefonoVacio_NoTieneErrores(string? telefonoVacio)
         {
             // Arrange
-            var dto = _dtoValido with { Telefono = telefonoVacio };
+            var dto = _dtoValido with { Telefono = telefonoVacio! };
 
             // Act
             var result = _validator.TestValidate(dto);

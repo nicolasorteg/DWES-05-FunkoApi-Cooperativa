@@ -12,35 +12,29 @@ public class UpdateFunkoValidator : AbstractValidator<UpdateFunkoDto> {
     public UpdateFunkoValidator() {
         
         // se valida solo si se proporciona el nombre
-        When(x => x.Nombre != null, () => {
-            RuleFor(x => x.Nombre)
-                .NotEmpty().WithMessage("El nombre del Funko no puede estar vacío si se proporciona")
-                .MaximumLength(100).WithMessage("El nombre no puede superar los 100 caracteres.");
-        });
+        RuleFor(x => x.Nombre)
+            .NotEmpty().WithMessage("El nombre del Funko no puede estar vacío si se proporciona")
+            .MaximumLength(100).WithMessage("El nombre no puede superar los 100 caracteres.");
+
 
         // se valida solo si se proporciona el precio
-        When(x => x.Precio.HasValue, () => {
-            RuleFor(x => x.Precio)
-                .GreaterThan(0).WithMessage("El precio debe ser mayor que 0.");
-        });
+        RuleFor(x => x.Precio)
+            .GreaterThan(0).WithMessage("El precio debe ser mayor que 0.");
+
         
         // se valida solo si se proporciona el stock
-        When(x => x.Stock.HasValue, () => {
-            RuleFor(x => x.Stock)
-                .GreaterThanOrEqualTo(0).WithMessage("El stock no puede ser negativo.");
-        });
+        RuleFor(x => x.Stock)
+            .GreaterThanOrEqualTo(0).WithMessage("El stock no puede ser negativo.");
+
         
         // se valida solo si se proporciona la categoria
-        When(x => x.CategoriaId != null, () => {
-            RuleFor(x => x.CategoriaId)
-                .NotEmpty().WithMessage("La categoría no puede estar vacía si se proporciona.");
-        });
+        RuleFor(x => x.CategoriaId)
+            .NotEmpty().WithMessage("La categoría no puede estar vacía si se proporciona.");
+
         
         // se valida solo si se proporciona el proveedor
-        When(x => x.ProveedorId != null, () => {
-            RuleFor(x => x.ProveedorId)
-                .NotEmpty().WithMessage("El proveedor no puede estar vacío si se proporciona.");
-        });
+        RuleFor(x => x.ProveedorId)
+            .NotEmpty().WithMessage("El proveedor no puede estar vacío si se proporciona.");
         
         // se valida solo si se proporciona la imagen
         When(x => x.Imagen != null, () => {

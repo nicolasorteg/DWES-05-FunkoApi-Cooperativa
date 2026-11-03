@@ -38,21 +38,6 @@ public abstract class UpdateFunkoValidatorTest
         }
 
         [Test]
-        public void Validar_DtoConTodosLosCamposNulos_NoTieneErrores()
-        {
-            // Arrange
-            var dto = new UpdateFunkoDto(
-                Nombre: null, Precio: null, Stock: null,
-                CategoriaId: null, ProveedorId: null, Imagen: null);
-
-            // Act
-            var result = _validator.TestValidate(dto);
-
-            // Assert
-            result.ShouldNotHaveAnyValidationErrors();
-        }
-
-        [Test]
         public void Validar_NombreCon100Caracteres_NoTieneErrores()
         {
             // Arrange
