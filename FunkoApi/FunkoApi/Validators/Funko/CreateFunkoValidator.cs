@@ -19,7 +19,6 @@ public class CreateFunkoValidator : AbstractValidator<CreateFunkoDto> {
             .GreaterThan(0).WithMessage("El precio debe ser mayor que 0.");
         
         RuleFor(x => x.Stock)
-            .NotEmpty().WithMessage("El stock del Funko es obligatorio.")
             .GreaterThanOrEqualTo(0).WithMessage("El stock no puede ser negativo.");
         
         RuleFor(x => x.CategoriaId)

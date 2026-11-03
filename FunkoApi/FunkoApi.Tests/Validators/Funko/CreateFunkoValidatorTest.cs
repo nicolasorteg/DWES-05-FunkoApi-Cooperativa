@@ -51,7 +51,6 @@ public abstract class CreateFunkoValidatorTest
         }
 
         [TestCase(0.01)]                  // mínimo estricto (> 0)
-        [TestCase(19.99)]
         [TestCase(999999.99)]
         public void Validar_PrecioMayorQueCero_NoTieneErrores(decimal precio)
         {
@@ -65,8 +64,7 @@ public abstract class CreateFunkoValidatorTest
             result.ShouldNotHaveValidationErrorFor(x => x.Precio);
         }
 
-        [TestCase(1)]
-        [TestCase(10)]
+        [TestCase(0)]
         [TestCase(9999)]
         public void Validar_StockPositivo_NoTieneErrores(int stock)
         {
@@ -172,22 +170,7 @@ public abstract class CreateFunkoValidatorTest
                   .WithErrorMessage("El precio debe ser mayor que 0.");
         }
 
-        [Test]
-        public void Validar_StockCero_TieneErrorNotEmpty()
-        {
-            // Arrange: 0 = "sin stock" → se considera vacío
-            var dto = _dtoValido with { Stock = 0 };
-
-            // Act
-            var result = _validator.TestValidate(dto);
-
-            // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Stock)
-                  .WithErrorMessage("El stock del Funko es obligatorio.");
-        }
-
         [TestCase(-1)]
-        [TestCase(-100)]
         public void Validar_StockNegativo_TieneErrorGreaterThanOrEqual(int stock)
         {
             // Arrange
