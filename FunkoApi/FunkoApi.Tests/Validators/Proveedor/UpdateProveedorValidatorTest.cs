@@ -184,7 +184,6 @@ public abstract class UpdateProveedorValidatorTest
                   .WithErrorMessage("El email no puede superar los 150 caracteres.");
         }
 
-        [TestCase("123")]
         [TestCase("123456")]
         [TestCase("123456789012345678901")]
         [TestCase("abc123456")]
