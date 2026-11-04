@@ -9,6 +9,14 @@ public class CategoriaRepository(AppDbContext db) : ICategoriaRepository {
     public async Task<IReadOnlyList<Categoria>> GetAllAsync() =>
         await db.Categorias.AsNoTracking().ToListAsync();
 
+    public async Task<IReadOnlyList<Categoria>> GetAllPagedAsync(int page = 1, int pageSize = 10) =>
+        await db.Categorias 
+            .AsNoTracking() 
+            .OrderBy(c => c.Nombre) 
+            .Skip((page - 1) * pageSize) 
+            .Take(pageSize) 
+            .ToListAsync();
+
     public async Task<Categoria?> GetByIdAsync(string id) =>
         await db.Categorias.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
 
