@@ -7,7 +7,6 @@ namespace FunkoApi.Models;
 public class Categoria {
 
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.None)] // no es autoincremental
     [YouTubeId] // id estilo yt
     public string Id { get; set; } = null!;
 
