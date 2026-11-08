@@ -30,7 +30,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(c => c.CreatedAt)
                 .IsRequired();
             
-            e.Property(c => c.DeletedAt)
+            e.Property(c => c.IsDeleted)
                 .HasDefaultValue(false);
 
             // soft delete
