@@ -50,13 +50,15 @@ public class ProveedorRepository(AppMongoDbContext db) : IProveedorRepository {
     }
 
     public async Task<bool> DeleteAsync(string id) {
-        var proveedor = await db.Proveedores.FindAsync(id); 
+        if (!ObjectId.TryParse(id, out var objectId)) return false;
+
+        var proveedor = await db.Proveedores.FindAsync(objectId);
         if (proveedor is null) return false;
-        
+
         proveedor.IsDeleted = true;
         proveedor.DeletedAt = DateTime.UtcNow;
-        
-        await db.SaveChangesAsync(); 
+
+        await db.SaveChangesAsync();
         return true;
     }
 }
