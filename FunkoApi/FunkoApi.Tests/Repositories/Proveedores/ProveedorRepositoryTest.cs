@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using FunkoApi.Entity;
 using FunkoApi.Models;
 using FunkoApi.Repositories.Proveedores;
@@ -21,7 +21,6 @@ public class ProveedorRepositoryTests : MongoTestBase {
 
     [SetUp]
     public void SetUp() {
-        // BD limpia en cada test: aislamiento total
         Client.DropDatabase(DbName);
 
         _context = NewContext();
@@ -37,8 +36,6 @@ public class ProveedorRepositoryTests : MongoTestBase {
         Telefono = "600000000"
     };
 
-    // ---------- AddAsync ----------
-
     [Test]
     public async Task AddAsync_ProveedorValido_GuardaConIdYFlags() {
         var resultado = await _repository.AddAsync(NuevoProveedor());
@@ -47,12 +44,9 @@ public class ProveedorRepositoryTests : MongoTestBase {
         resultado.IsDeleted.Should().BeFalse();
         resultado.UpdatedAt.Should().NotBeNull();
 
-        // Se comprueba con otro contexto: viene de la BD, no del tracker
         await using var otro = NewContext();
         (await otro.Proveedores.AnyAsync(p => p.Id == resultado.Id)).Should().BeTrue();
     }
-
-    // ---------- GetAllAsync ----------
 
     [Test]
     public async Task GetAllAsync_SinDatos_DevuelveListaVacia() {
@@ -70,8 +64,6 @@ public class ProveedorRepositoryTests : MongoTestBase {
 
         resultado.Should().HaveCount(2);
     }
-
-    // ---------- GetAllPagedAsync ----------
 
     [Test]
     public async Task GetAllPagedAsync_PrimeraPagina_DevuelveOrdenadosPorNombre() {
@@ -104,8 +96,6 @@ public class ProveedorRepositoryTests : MongoTestBase {
         resultado.Should().HaveCount(1);
     }
 
-    // ---------- GetByIdAsync ----------
-
     [Test]
     public async Task GetByIdAsync_IdNoValido_DevuelveNull() {
         var resultado = await _repository.GetByIdAsync("esto-no-es-un-objectid");
@@ -129,8 +119,6 @@ public class ProveedorRepositoryTests : MongoTestBase {
         resultado.Should().NotBeNull();
         resultado!.Nombre.Should().Be("Logitech");
     }
-
-    // ---------- UpdateAsync ----------
 
     [Test]
     public async Task UpdateAsync_ProveedorNoExiste_DevuelveNull() {
@@ -164,8 +152,6 @@ public class ProveedorRepositoryTests : MongoTestBase {
         var enBd = await otro.Proveedores.FirstAsync(p => p.Id == creado.Id);
         enBd.Nombre.Should().Be("Logitech Pro");
     }
-
-    // ---------- DeleteAsync ----------
 
     [Test]
     public async Task DeleteAsync_IdNoValido_DevuelveFalse() {

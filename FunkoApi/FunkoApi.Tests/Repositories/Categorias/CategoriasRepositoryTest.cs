@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using FunkoApi.Entity;
 using FunkoApi.Models;
 using FunkoApi.Repositories.Categorias;
@@ -14,8 +14,6 @@ public class CategoriaRepositoryTests : PostgresTestBase {
     [SetUp]
     public async Task SetUp() {
         _context = NewContext();
-
-        // BD limpia en cada test (IgnoreQueryFilters por si hay filtro de IsDeleted)
         await _context.Categorias.IgnoreQueryFilters().ExecuteDeleteAsync();
 
         _repository = new CategoriaRepository(_context);
@@ -26,12 +24,10 @@ public class CategoriaRepositoryTests : PostgresTestBase {
 
     private static Categoria NuevaCategoria(string nombre = "Cómics") => new() { Nombre = nombre };
 
-    // ---------- AddAsync ----------
-
     [Test]
     public async Task AddAsync_CategoriaValida_GeneraIdYRellenaCampos() {
         var entrada = NuevaCategoria();
-        entrada.IsDeleted = true; // el repo debe forzarlo a false
+        entrada.IsDeleted = true;
 
         var resultado = await _repository.AddAsync(entrada);
 
@@ -39,12 +35,9 @@ public class CategoriaRepositoryTests : PostgresTestBase {
         resultado.IsDeleted.Should().BeFalse();
         resultado.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
-        // Se comprueba con otro contexto: viene de la BD, no del tracker
         await using var otro = NewContext();
         (await otro.Categorias.AnyAsync(c => c.Id == resultado.Id)).Should().BeTrue();
     }
-
-    // ---------- GetAllAsync ----------
 
     [Test]
     public async Task GetAllAsync_SinDatos_DevuelveListaVacia() {
@@ -62,8 +55,6 @@ public class CategoriaRepositoryTests : PostgresTestBase {
 
         resultado.Should().HaveCount(2);
     }
-
-    // ---------- GetAllPagedAsync ----------
 
     [Test]
     public async Task GetAllPagedAsync_PrimeraPagina_DevuelveOrdenadasPorNombre() {
@@ -96,8 +87,6 @@ public class CategoriaRepositoryTests : PostgresTestBase {
         resultado.Should().HaveCount(1);
     }
 
-    // ---------- GetByIdAsync ----------
-
     [Test]
     public async Task GetByIdAsync_CategoriaExiste_DevuelveCategoria() {
         var creada = await _repository.AddAsync(NuevaCategoria("Cómics"));
@@ -114,8 +103,6 @@ public class CategoriaRepositoryTests : PostgresTestBase {
 
         resultado.Should().BeNull();
     }
-
-    // ---------- UpdateAsync ----------
 
     [Test]
     public async Task UpdateAsync_CategoriaNoExiste_DevuelveNull() {
@@ -141,8 +128,6 @@ public class CategoriaRepositoryTests : PostgresTestBase {
         var enBd = await otro.Categorias.FirstAsync(c => c.Id == creada.Id);
         enBd.Nombre.Should().Be("Superhéroes");
     }
-
-    // ---------- DeleteAsync ----------
 
     [Test]
     public async Task DeleteAsync_CategoriaNoExiste_DevuelveFalse() {
