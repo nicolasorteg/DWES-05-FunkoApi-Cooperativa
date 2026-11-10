@@ -15,4 +15,10 @@ public class ModelErrors {
 
     public static DomainError FunkoAsociado() =>
         new ModelsError.FunkoAsociado();
+    
+    public static DomainError CategoriaNotFound(string categoriaId) =>
+        new ModelsError.CategoriaNotFound(categoriaId);
+
+    public static DomainError ProveedorNotFound(string proveedorId) =>
+        new ModelsError.ProveedorNotFound(proveedorId);
 }

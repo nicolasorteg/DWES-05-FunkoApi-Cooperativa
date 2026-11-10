@@ -10,6 +10,7 @@ using FunkoApi.Repositories.Funkos;
 using FunkoApi.Repositories.Proveedores;
 using FunkoApi.Services.Cache;
 using FunkoApi.Services.Proveedor;
+using FunkoApi.Services.Proveedores;
 
 namespace FunkoApi.Tests.Services.Proveedores;
 
