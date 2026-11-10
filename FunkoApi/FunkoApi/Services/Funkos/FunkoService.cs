@@ -33,7 +33,7 @@ public class FunkoService(
         var funkos = await funkoRepository.GetAllPagedAsync(page, pageSize);
 
         // un proveedor puede repetirse en varios funkos: se consulta una sola vez
-        var proveedores = new Dictionary<string, Proveedor>();
+        var proveedores = new Dictionary<string, Models.Proveedor>();
         foreach (var proveedorId in funkos.Select(f => f.ProveedorId).Distinct()) {
             var proveedor = await proveedorRepository.GetByIdAsync(proveedorId);
             if (proveedor is null) {
