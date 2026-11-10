@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentValidation;
 using FluentValidation.Results;
 using Moq;
 using FunkoApi.Dto.Categoria;
