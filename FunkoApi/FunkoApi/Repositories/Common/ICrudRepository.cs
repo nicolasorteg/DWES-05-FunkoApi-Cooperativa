@@ -1,6 +1,4 @@
-﻿using FunkoApi.Models;
-
-namespace FunkoApi.Repositories.Common;
+﻿namespace FunkoApi.Repositories.Common;
 
 public interface ICrudRepository<TEntity, in TKey> where TEntity : class {
     Task<IReadOnlyList<TEntity>> GetAllAsync();

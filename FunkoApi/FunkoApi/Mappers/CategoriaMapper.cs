@@ -18,8 +18,8 @@ public static class CategoriaMapper {
     };
     
     // updatedto -> model
-    public static void UpdateEntity(this UpdateCategoriaDto dto, Categoria categoria) {
-        categoria.Nombre = dto.Nombre; 
-        categoria.UpdatedAt = DateTime.UtcNow;
-    }
+    public static Categoria UpdateEntity(this UpdateCategoriaDto categoria) => new() {
+        Nombre = categoria.Nombre,
+        CreatedAt = DateTime.UtcNow
+    };
 }

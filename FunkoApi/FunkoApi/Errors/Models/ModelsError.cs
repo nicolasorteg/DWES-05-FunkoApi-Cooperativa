@@ -13,6 +13,6 @@ public static class ModelsError {
         : DomainError(Mensaje);
 
     // regla de negocio
-    public sealed record FunkoAsociado(int Id)
-        : DomainError($"No se puede eliminar el modelo puesto que tiene un Funko de id: {Id} asociado.");
+    public sealed record FunkoAsociado()
+        : DomainError($"No se puede eliminar el modelo puesto que tiene un Funko asociado.");
 }
