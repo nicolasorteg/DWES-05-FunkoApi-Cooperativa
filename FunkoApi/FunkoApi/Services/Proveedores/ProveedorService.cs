@@ -7,8 +7,9 @@ using FunkoApi.Mapper;
 using FunkoApi.Repositories.Funkos;
 using FunkoApi.Repositories.Proveedores;
 using FunkoApi.Services.Cache;
+using FunkoApi.Services.Proveedor;
 
-namespace FunkoApi.Services.Proveedor;
+namespace FunkoApi.Services.Proveedores;
 
 public class ProveedorService (
     IProveedorRepository proveedorRepository,

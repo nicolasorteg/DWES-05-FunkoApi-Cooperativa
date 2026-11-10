@@ -15,4 +15,12 @@ public static class ModelsError {
     // regla de negocio
     public sealed record FunkoAsociado()
         : DomainError($"No se puede eliminar el modelo puesto que tiene un Funko asociado.");
+    
+    // 404 (la categoría del funko no existe o está borrada)
+    public sealed record CategoriaNotFound(string CategoriaId)
+        : DomainError($"No se ha encontrado la categoría con el identificador: {CategoriaId}");
+
+    // 404 (el proveedor del funko no existe o está borrado)
+    public sealed record ProveedorNotFound(string ProveedorId)
+        : DomainError($"No se ha encontrado el proveedor con el identificador: {ProveedorId}");
 }
