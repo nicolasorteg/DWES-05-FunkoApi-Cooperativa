@@ -1,4 +1,4 @@
-﻿using FunkoApi.Entity;
+using FunkoApi.Entity;
 using FunkoApi.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +18,7 @@ public class CategoriaRepository(AppDbContext db) : ICategoriaRepository {
             .ToListAsync();
 
     public async Task<Categoria?> GetByIdAsync(string id) =>
-        await db.Categorias.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+        await db.Categorias.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
 
     public async Task<Categoria> AddAsync(Categoria categoria) {
         categoria.CreatedAt = DateTime.UtcNow;

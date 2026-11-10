@@ -1,4 +1,4 @@
-﻿using FunkoApi.Entity;
+using FunkoApi.Entity;
 using FunkoApi.Models;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
@@ -22,7 +22,7 @@ public class ProveedorRepository(AppMongoDbContext db) : IProveedorRepository {
         if (!ObjectId.TryParse(id, out var objectId)) return null; // parse id -> objectid
         return await db.Proveedores
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Id == objectId);
+            .FirstOrDefaultAsync(p => p.Id == objectId && !p.IsDeleted);
     }
 
     public async Task<Proveedor> AddAsync(Proveedor entity) {

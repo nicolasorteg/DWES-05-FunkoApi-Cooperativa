@@ -39,17 +39,28 @@ public class CategoriaServiceTests
             _cacheMock.Object
         );
     }
+    
+    private List<string> CapturarClavesPaginadas()
+    {
+        var keys = new List<string>();
+        _cacheMock
+            .Setup(c => c.GetAsync<IReadOnlyList<ResponseCategoriaDto>>(It.IsAny<string>()))
+            .Callback<string, CancellationToken>((k, _) => keys.Add(k))
+            .ReturnsAsync((IReadOnlyList<ResponseCategoriaDto>?)null);
+        _categoriaRepoMock
+            .Setup(r => r.GetAllPagedAsync(1, 10))
+            .ReturnsAsync(new List<Categoria>());
+        return keys;
+    }
 
     [Test]
     public async Task GetAllPagedAsync_DevuelveDesdeCache_CuandoExisteEnCache()
     {
-        var cachedList = new List<ResponseCategoriaDto>
-        {
-            new("Anime00001", "Anime")
-        };
+        var cachedList = new List<ResponseCategoriaDto> { new("Anime00001", "Anime") };
 
         _cacheMock
-            .Setup(c => c.GetAsync<IReadOnlyList<ResponseCategoriaDto>>("categorias:all"))
+            .Setup(c => c.GetAsync<IReadOnlyList<ResponseCategoriaDto>>(
+                It.Is<string>(k => k.StartsWith("categorias:paged:"))))
             .ReturnsAsync(cachedList);
 
         var result = await _service.GetAllPagedAsync(1, 10);
@@ -57,7 +68,6 @@ public class CategoriaServiceTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().HaveCount(1);
         result.Value[0].Nombre.Should().Be("Anime");
-
         _categoriaRepoMock.Verify(r => r.GetAllPagedAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
     }
 
@@ -65,26 +75,22 @@ public class CategoriaServiceTests
     public async Task GetAllPagedAsync_ConsultaRepoYGuardaEnCache_CuandoNoExisteEnCache()
     {
         _cacheMock
-            .Setup(c => c.GetAsync<IReadOnlyList<ResponseCategoriaDto>>("categorias:all"))
+            .Setup(c => c.GetAsync<IReadOnlyList<ResponseCategoriaDto>>(It.IsAny<string>()))
             .ReturnsAsync((IReadOnlyList<ResponseCategoriaDto>?)null);
-
-        var categorias = new List<Categoria>
-        {
-            new() { Id = "Anime00001", Nombre = "Anime" }
-        };
 
         _categoriaRepoMock
             .Setup(r => r.GetAllPagedAsync(1, 10))
-            .ReturnsAsync(categorias);
+            .ReturnsAsync(new List<Categoria> { new() { Id = "Anime00001", Nombre = "Anime" } });
 
         var result = await _service.GetAllPagedAsync(1, 10);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().HaveCount(1);
-
-        // OJO: el servicio llama a SetAsync con un List<>, no con IReadOnlyList<>
         _cacheMock.Verify(
-            c => c.SetAsync("categorias:all", It.IsAny<List<ResponseCategoriaDto>>(), It.IsAny<TimeSpan>()),
+            c => c.SetAsync(
+                It.Is<string>(k => k.StartsWith("categorias:paged:") && k.EndsWith(":1:10")),
+                It.IsAny<List<ResponseCategoriaDto>>(),
+                It.IsAny<TimeSpan>()),
             Times.Once);
     }
 
@@ -156,22 +162,25 @@ public class CategoriaServiceTests
     }
 
     [Test]
-    public async Task AddAsync_CreaCategoriaEInvalidaCache_CuandoDtoEsValido()
+    public async Task AddAsync_CreaCategoriaEInvalidaCachePaginada_CuandoDtoEsValido()
     {
+        var keys = CapturarClavesPaginadas();
         var dto = new CreateCategoriaDto("Manga");
         _createValidatorMock
             .Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
-
         _categoriaRepoMock
             .Setup(r => r.AddAsync(It.IsAny<Categoria>()))
             .ReturnsAsync(new Categoria { Id = "Manga00001", Nombre = "Manga" });
 
+        await _service.GetAllPagedAsync(1, 10);  
         var result = await _service.AddAsync(dto);
+        await _service.GetAllPagedAsync(1, 10); 
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Nombre.Should().Be("Manga");
-        _cacheMock.Verify(c => c.RemoveAsync("categorias:all"), Times.Once);
+        keys.Should().HaveCount(2);
+        keys[0].Should().NotBe(keys[1]);                 
     }
     
 
@@ -231,11 +240,11 @@ public class CategoriaServiceTests
     [Test]
     public async Task UpdateAsync_ActualizaCategoriaEInvalidaCache_CuandoEsValido()
     {
+        var keys = CapturarClavesPaginadas();
         var dto = new UpdateCategoriaDto("Anime Editado");
         _updateValidatorMock
             .Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
-
         _categoriaRepoMock
             .Setup(r => r.GetByIdAsync("Anime00001"))
             .ReturnsAsync(new Categoria { Id = "Anime00001", Nombre = "Anime" });
@@ -243,12 +252,14 @@ public class CategoriaServiceTests
             .Setup(r => r.UpdateAsync(It.IsAny<Categoria>()))
             .ReturnsAsync(new Categoria { Id = "Anime00001", Nombre = "Anime Editado" });
 
+        await _service.GetAllPagedAsync(1, 10);
         var result = await _service.UpdateAsync("Anime00001", dto);
+        await _service.GetAllPagedAsync(1, 10);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Nombre.Should().Be("Anime Editado");
         _cacheMock.Verify(c => c.RemoveAsync("categoria:Anime00001"), Times.Once);
-        _cacheMock.Verify(c => c.RemoveAsync("categorias:all"), Times.Once);
+        keys[0].Should().NotBe(keys[1]);
     }
     
     [Test]
@@ -303,20 +314,19 @@ public class CategoriaServiceTests
     [Test]
     public async Task DeleteAsync_EliminaEInvalidaCache_CuandoEsValidoYNoTieneFunkos()
     {
+        var keys = CapturarClavesPaginadas();
         _categoriaRepoMock
             .Setup(r => r.GetByIdAsync("Anime00001"))
             .ReturnsAsync(new Categoria { Id = "Anime00001", Nombre = "Anime" });
-        _funkoRepoMock
-            .Setup(r => r.ExistsByCategoriaAsync("Anime00001"))
-            .ReturnsAsync(false);
-        _categoriaRepoMock
-            .Setup(r => r.DeleteAsync("Anime00001"))
-            .ReturnsAsync(true);
+        _funkoRepoMock.Setup(r => r.ExistsByCategoriaAsync("Anime00001")).ReturnsAsync(false);
+        _categoriaRepoMock.Setup(r => r.DeleteAsync("Anime00001")).ReturnsAsync(true);
 
+        await _service.GetAllPagedAsync(1, 10);
         var result = await _service.DeleteAsync("Anime00001");
+        await _service.GetAllPagedAsync(1, 10);
 
         result.IsSuccess.Should().BeTrue();
         _cacheMock.Verify(c => c.RemoveAsync("categoria:Anime00001"), Times.Once);
-        _cacheMock.Verify(c => c.RemoveAsync("categorias:all"), Times.Once);
+        keys[0].Should().NotBe(keys[1]);
     }
 }

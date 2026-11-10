@@ -18,13 +18,18 @@ public class CategoriaService (
     ICacheService cache) : ICategoriaService 
 {
     
-    private const string CacheKeyAll = "categorias:all"; 
+    private static long _pagedCacheVersion;
+    private static string CacheKeyPaged(int page, int pageSize) =>
+        $"categorias:paged:v{Volatile.Read(ref _pagedCacheVersion)}:{page}:{pageSize}";  
+    private static void InvalidatePagedCache() => Interlocked.Increment(ref _pagedCacheVersion);
     private static string CacheKeyItem(string id) => $"categoria:{id}";
     
     public async Task<Result<IReadOnlyList<ResponseCategoriaDto>, DomainError>> GetAllPagedAsync(int page = 1, int pageSize = 10) {
         
+        var cacheKey = CacheKeyPaged(page, pageSize);
+        
         // primero busca en cache
-        var cached = await cache.GetAsync<IReadOnlyList<ResponseCategoriaDto>>(CacheKeyAll);
+        var cached = await cache.GetAsync<IReadOnlyList<ResponseCategoriaDto>>(cacheKey);
         if (cached != null) 
             return Result.Success<IReadOnlyList<ResponseCategoriaDto>, DomainError>(cached);
         
@@ -33,7 +38,7 @@ public class CategoriaService (
         var dtos = categorias.Select(c => c.ToResponseDto()).ToList();
         
         // set en la cache
-        await cache.SetAsync(CacheKeyAll, dtos, TimeSpan.FromMinutes(10)); 
+        await cache.SetAsync(cacheKey, dtos, TimeSpan.FromMinutes(10)); 
         return Result.Success<IReadOnlyList<ResponseCategoriaDto>, DomainError>(dtos);
     }
 
@@ -70,7 +75,7 @@ public class CategoriaService (
         var entity = dto.ToEntity(); 
         var creado = await categoriaRepository.AddAsync(entity);
         
-        await cache.RemoveAsync(CacheKeyAll);
+        InvalidatePagedCache();
         return Result.Success<ResponseCategoriaDto, DomainError>(creado.ToResponseDto());
     }
 
@@ -95,7 +100,7 @@ public class CategoriaService (
             return Result.Failure<ResponseCategoriaDto, DomainError>(ModelErrors.NotFound(id));
         
         await cache.RemoveAsync(CacheKeyItem(id)); 
-        await cache.RemoveAsync(CacheKeyAll); 
+        InvalidatePagedCache();
         return Result.Success<ResponseCategoriaDto, DomainError>(actualizado.ToResponseDto());
     }
 
@@ -119,7 +124,7 @@ public class CategoriaService (
 
         // invalidar cachés
         await cache.RemoveAsync(CacheKeyItem(id));
-        await cache.RemoveAsync(CacheKeyAll);
+        InvalidatePagedCache();
 
         return UnitResult.Success<DomainError>();
     }
