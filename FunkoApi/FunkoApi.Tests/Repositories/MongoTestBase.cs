@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Testcontainers.MongoDb;
 
-namespace FunkoApi.Tests;
+namespace FunkoApi.Tests.Repositories;
 
 public abstract class MongoTestBase {
     private readonly MongoDbContainer _mongo = new MongoDbBuilder()

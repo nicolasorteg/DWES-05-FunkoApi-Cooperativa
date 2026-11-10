@@ -4,10 +4,8 @@ using FunkoApi.Models;
 using FunkoApi.Repositories.Proveedores;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
-using MongoDB.EntityFrameworkCore.Extensions;
-using NUnit.Framework;
 
-namespace FunkoApi.Tests;
+namespace FunkoApi.Tests.Repositories.Proveedores;
 
 [TestFixture]
 public class ProveedorRepositoryTests : MongoTestBase {

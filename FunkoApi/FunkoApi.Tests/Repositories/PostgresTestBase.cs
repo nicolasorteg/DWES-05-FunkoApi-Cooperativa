@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 
-namespace FunkoApi.Tests.Repositories.Categorias;
+namespace FunkoApi.Tests.Repositories;
 
 public abstract class PostgresTestBase {
     
