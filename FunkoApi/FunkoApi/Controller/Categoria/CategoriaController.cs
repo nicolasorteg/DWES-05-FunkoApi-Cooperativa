@@ -1,4 +1,5 @@
 ﻿using FunkoApi.Dto.Categoria;
+using FunkoApi.Errors.Common;
 using FunkoApi.Errors.Models;
 using FunkoApi.Services.Categoria;
 using Microsoft.AspNetCore.Authorization;

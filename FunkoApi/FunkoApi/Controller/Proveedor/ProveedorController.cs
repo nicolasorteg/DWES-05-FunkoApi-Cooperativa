@@ -1,4 +1,5 @@
 ﻿using FunkoApi.Dto.Proveedor;
+using FunkoApi.Errors.Common;
 using FunkoApi.Errors.Models;
 using FunkoApi.Services.Proveedor;
 using Microsoft.AspNetCore.Authorization;
