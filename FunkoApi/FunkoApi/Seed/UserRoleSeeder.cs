@@ -1,5 +1,6 @@
 ﻿using FunkoApi.Models;
 using Microsoft.AspNetCore.Identity;
+using static System.String;
 
 namespace FunkoApi.Seed;
 
@@ -7,8 +8,6 @@ public static class UserRoleSeeder
 {
     public static async Task SeedIdentityAsync(IServiceProvider services, ILogger logger)
     {
-        logger.LogInformation("Iniciando la siembra de seguridad (Roles y Usuarios)...");
-
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole<long>>>();
         var userManager = services.GetRequiredService<UserManager<AppUser>>();
 
@@ -39,7 +38,7 @@ public static class UserRoleSeeder
             email: "admin@admin.com",
             password: "Admin123@",
             nombre: "Administrador",
-            apellido: "Principal",
+            apellido: "Dios",
             role: "ADMIN"
         );
 
@@ -48,9 +47,9 @@ public static class UserRoleSeeder
             userManager,
             logger,
             email: "user@user.com",
-            password: "User123!",
+            password: "User123@",
             nombre: "Usuario",
-            apellido: "Estándar",
+            apellido: "Normal",
             role: "USER"
         );
     }
@@ -82,7 +81,7 @@ public static class UserRoleSeeder
         if (resultadoCreacion.Succeeded) {
             await userManager.AddToRoleAsync(nuevoUsuario, role);
         } else {
-            string.Join(" | ", resultadoCreacion.Errors.Select(e => e.Description));
+            var join = Join(" | ", resultadoCreacion.Errors.Select(e => e.Description));
         }
     }
 }
