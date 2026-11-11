@@ -1,12 +1,19 @@
+using FunkoApi.Configuration;
+using FunkoApi.Services.Email;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// --- REGISTRO DE SERVICIOS (Antes de builder.Build()) ---
 builder.Services.AddOpenApi();
 
+// Configuración y registro del servicio de email
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+// --- CONSTRUCCIÓN DE LA APLICACIÓN ---
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// --- CONFIGURACIÓN DEL PIPELINE DE HTTP Y ENDPOINTS ---
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
 }
