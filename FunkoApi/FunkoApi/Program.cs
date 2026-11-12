@@ -18,6 +18,7 @@ builder.Services.AddControllers();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSignalR();
+builder.Services.AddGraphQLConfiguration();
 
 var app = builder.Build();
 
@@ -35,6 +36,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<FunkosHub>("/hubs/funkos").RequireAuthorization();
 app.MapControllers();
+app.MapGraphQL();
 
 // Seed inicial de datos (categorías, proveedores, funkos, roles y usuarios por defecto)
 using (var scope = app.Services.CreateScope())

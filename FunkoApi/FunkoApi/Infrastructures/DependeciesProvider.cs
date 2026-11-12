@@ -2,6 +2,7 @@ using System.Text;
 using FluentValidation;
 using FunkoApi.Configuration;
 using FunkoApi.Entity;
+using FunkoApi.GraphQL;
 using FunkoApi.Models;
 using FunkoApi.Repositories.Categorias;
 using FunkoApi.Repositories.Funkos;
@@ -21,6 +22,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using MongoDB.Driver;
+using Path = System.IO.Path;
+using HotChocolate.AspNetCore;
 
 namespace FunkoApi.Infrastructures;
 
@@ -207,6 +210,17 @@ public static class DependenciesProvider
                 options.IncludeXmlComments(xmlPath);
             }
         });
+
+        return services;
+    }
+    
+    public static IServiceCollection AddGraphQLConfiguration(this IServiceCollection services) { 
+        services .AddGraphQLServer() 
+            .AddQueryType<Query>()
+            .AddMutationType<Mutation>()
+            .AddAuthorization()
+            .AddFiltering()
+            .AddSorting();
 
         return services;
     }

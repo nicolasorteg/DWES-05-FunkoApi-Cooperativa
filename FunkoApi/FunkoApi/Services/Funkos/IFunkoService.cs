@@ -3,7 +3,4 @@ using FunkoApi.Services.Common;
 
 namespace FunkoApi.Services.Funkos;
 
-public interface IFunkoService : ICrudService<ResponseFunkoDto, CreateFunkoDto, UpdateFunkoDto, long>
-{
-    
-}
+public interface IFunkoService : ICrudService<ResponseFunkoDto, CreateFunkoDto, UpdateFunkoDto, long> { }
