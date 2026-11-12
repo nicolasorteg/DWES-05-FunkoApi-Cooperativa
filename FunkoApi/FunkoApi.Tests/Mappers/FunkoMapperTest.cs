@@ -84,7 +84,7 @@ public class FunkoMapperTest {
             var res = _funko.ToResponseDto(_proveedor);
 
             // assert
-            res.Imagen.Should().Be("/uploads/images/default-funko.png");
+            res.Imagen.Should().Be("/uploads/images/default-funko.jpg");
         }
 
         [Test]
@@ -128,7 +128,7 @@ public class FunkoMapperTest {
         [TestCase(null)]
         [TestCase("")]
         [TestCase("   ")]
-        public void ToEntityFromCreateDto_ConImagenVacia_DeberiaGuardarImagenNull(string? imagen) {
+        public void ToEntityFromCreateDto_ConImagenVacia_DeberiaGuardarImagenDefault(string? imagen) {
 
             // arrange
             var dto = new CreateFunkoDto(
@@ -138,7 +138,7 @@ public class FunkoMapperTest {
             var res = dto.ToEntity();
 
             // assert
-            res.Imagen.Should().BeNull();
+            res.Imagen.Should().Be("/uploads/images/default-funko.jpg");
         }
 
         // ---------- UpdateEntity (PUT completo) ----------

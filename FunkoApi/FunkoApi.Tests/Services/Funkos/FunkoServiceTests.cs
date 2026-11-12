@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Moq;
 using FunkoApi.Dto.Funko;
 using FunkoApi.Errors.Models;
+using FunkoApi.Hubs;
 using FunkoApi.Mapper;
 using FunkoApi.Models;
 using FunkoApi.Repositories.Categorias;
@@ -10,6 +11,7 @@ using FunkoApi.Repositories.Funkos;
 using FunkoApi.Repositories.Proveedores;
 using FunkoApi.Services.Cache;
 using FunkoApi.Services.Funkos;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
@@ -56,6 +58,8 @@ public class FunkoServiceTests
     private static Mock<IValidator<CreateFunkoDto>> _createValidatorMock = null!;
     private static Mock<IValidator<UpdateFunkoDto>> _updateValidatorMock = null!;
     private static Mock<ICacheService> _cacheMock = null!;
+    private static Mock<IHubContext<FunkosHub>> _funkosHubMock = null!;
+    private static Mock<IClientProxy> _clientProxyMock = null!;
 
     private static FunkoService _service = null!;
 
@@ -67,6 +71,13 @@ public class FunkoServiceTests
         _createValidatorMock = new Mock<IValidator<CreateFunkoDto>>();
         _updateValidatorMock = new Mock<IValidator<UpdateFunkoDto>>();
         _cacheMock = new Mock<ICacheService>();
+        _funkosHubMock = new Mock<IHubContext<FunkosHub>>();
+        
+        _clientProxyMock = new Mock<IClientProxy>();
+        var clientsMock = new Mock<IHubClients>();
+        clientsMock.Setup(c => c.All).Returns(_clientProxyMock.Object);
+        clientsMock.Setup(c => c.Group(It.IsAny<string>())).Returns(_clientProxyMock.Object);
+        _funkosHubMock.Setup(h => h.Clients).Returns(clientsMock.Object);
 
         // por defecto los DTOs son válidos; los tests de CasosInvalidos lo sobrescriben
         _createValidatorMock
@@ -83,6 +94,7 @@ public class FunkoServiceTests
             _createValidatorMock.Object,
             _updateValidatorMock.Object,
             _cacheMock.Object,
+            _funkosHubMock.Object,
             new Mock<ILogger<FunkoService>>().Object
         );
     }
