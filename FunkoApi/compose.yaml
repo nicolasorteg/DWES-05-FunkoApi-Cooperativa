@@ -1,7 +1,0 @@
-﻿services:
-  funkoapi:
-    image: funkoapi
-    build:
-      context: .
-      dockerfile: FunkoApi/Dockerfile
-

@@ -1,5 +1,6 @@
 using FunkoApi.Configuration;
 using FunkoApi.Entity;
+using FunkoApi.Hubs;
 using FunkoApi.Infrastructures;
 using FunkoApi.Seed;
 using FunkoApi.Services.Email;
@@ -16,6 +17,7 @@ builder.Services.AddControllers();
 // Configuración y registro del servicio de email
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -28,8 +30,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHub<FunkosHub>("/hubs/funkos").RequireAuthorization();
 app.MapControllers();
 
 // Seed inicial de datos (categorías, proveedores, funkos, roles y usuarios por defecto)

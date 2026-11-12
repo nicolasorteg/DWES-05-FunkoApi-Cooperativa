@@ -5,7 +5,7 @@ namespace FunkoApi.Mapper;
 
 public static class FunkoMapper {
     
-    private const string DefaultImage = "/uploads/images/default-funko.png";
+    private const string DefaultImage = "/uploads/images/default-funko.jpg";
 
     // model -> resposedto
     public static ResponseFunkoDto ToResponseDto(this Funko funko, Proveedor proveedor) { 
@@ -30,7 +30,7 @@ public static class FunkoMapper {
             Stock = dto.Stock, 
             CategoriaId = dto.CategoriaId, 
             ProveedorId = dto.ProveedorId, 
-            Imagen = string.IsNullOrWhiteSpace(dto.Imagen) ? null : dto.Imagen, 
+            Imagen = string.IsNullOrWhiteSpace(dto.Imagen) ? DefaultImage : dto.Imagen, 
             CreatedAt = DateTime.UtcNow
         };
     }

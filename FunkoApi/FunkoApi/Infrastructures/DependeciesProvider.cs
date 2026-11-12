@@ -7,6 +7,7 @@ using FunkoApi.Repositories.Categorias;
 using FunkoApi.Repositories.Funkos;
 using FunkoApi.Repositories.Proveedores;
 using FunkoApi.Services.Auth;
+using FunkoApi.Services.Background;
 using FunkoApi.Services.Cache;
 using FunkoApi.Services.Categoria;
 using FunkoApi.Services.Funkos;
@@ -100,6 +101,18 @@ public static class DependenciesProvider
                 ValidateLifetime = true,
                 RoleClaimType = System.Security.Claims.ClaimTypes.Role
             };
+
+            options.Events = new JwtBearerEvents {
+                OnMessageReceived = context => {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path; 
+                    // Extrae el token si la petición va dirigida a un Hub de SignalR
+                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs")) {
+                        context.Token = accessToken;
+                    } 
+                    return Task.CompletedTask;
+                }
+            };
         });
 
         services.AddAuthorization();
@@ -142,6 +155,9 @@ public static class DependenciesProvider
 
         // Validadores de FluentValidation
         services.AddValidatorsFromAssemblyContaining<CategoriaService>();
+        
+        // tareas en segundo plano
+        services.AddHostedService<GreetingBackgroundService>();
 
         return services;
     }
@@ -150,6 +166,14 @@ public static class DependenciesProvider
     private static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
+        services.AddCors(options => { 
+            options.AddDefaultPolicy(policy => { policy.SetIsOriginAllowed(_ => true) 
+                // Permite conexioneslocales
+                .AllowAnyHeader() 
+                .AllowAnyMethod()
+                .AllowCredentials(); // ¡Obligatorio para SignalR!
+            }); 
+        });
         services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo

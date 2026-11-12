@@ -3,12 +3,14 @@ using FluentValidation;
 using FunkoApi.Dto.Funko;
 using FunkoApi.Errors.Common;
 using FunkoApi.Errors.Models;
+using FunkoApi.Hubs;
 using FunkoApi.Mapper;
 using FunkoApi.Repositories.Categorias;
 using FunkoApi.Repositories.Funkos;
 using FunkoApi.Repositories.Proveedores;
 using FunkoApi.Services.Cache;
 using FunkoApi.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace FunkoApi.Services.Funkos;
 
@@ -23,6 +25,7 @@ public class FunkoService(
     IValidator<CreateFunkoDto> createValidator,
     IValidator<UpdateFunkoDto> updateValidator,
     ICacheService cache,
+    IHubContext<FunkosHub> hubContext,
     ILogger<FunkoService> logger) : IFunkoService {
 
     private static string CacheKey(long id) => $"funko:{id}";
@@ -107,6 +110,9 @@ public class FunkoService(
 
         // se vuelve a leer para traer la categoría (Include) sin tocar entidades que EF está siguiendo
         var completo = await funkoRepository.GetByIdAsync(creado.Id);
+        
+        var responseDto = completo!.ToResponseDto(proveedor);
+        await hubContext.Clients.Group("admins") .SendAsync("FunkoCreado", responseDto);
 
         logger.LogInformation("Funko {Id} creado", creado.Id);
         return Result.Success<ResponseFunkoDto, DomainError>(completo!.ToResponseDto(proveedor));
@@ -151,6 +157,8 @@ public class FunkoService(
         await cache.RemoveAsync(CacheKey(id));
 
         var completo = await funkoRepository.GetByIdAsync(id);
+        var responseDto = completo!.ToResponseDto(proveedor);
+        await hubContext.Clients.All.SendAsync("FunkoActualizado", responseDto);
 
         logger.LogInformation("Funko {Id} actualizado", id);
         return Result.Success<ResponseFunkoDto, DomainError>(completo!.ToResponseDto(proveedor));
@@ -166,6 +174,8 @@ public class FunkoService(
         }
 
         await cache.RemoveAsync(CacheKey(id));
+        
+        await hubContext.Clients.All .SendAsync("FunkoEliminado", id);
 
         logger.LogInformation("Funko {Id} borrado", id);
         return UnitResult.Success<DomainError>();
