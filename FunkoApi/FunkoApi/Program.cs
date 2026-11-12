@@ -1,44 +1,54 @@
 using FunkoApi.Configuration;
+using FunkoApi.Entity;
+using FunkoApi.Infrastructures;
+using FunkoApi.Seed;
 using FunkoApi.Services.Email;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- REGISTRO DE SERVICIOS (Antes de builder.Build()) ---
-builder.Services.AddOpenApi();
+// Registro de todos los servicios (BD, Identity/JWT, caché, repos, servicios, validadores, Swagger)
+builder.Services.AddAllDependencies(builder.Configuration, builder.Environment);
+
+// Controladores
+builder.Services.AddControllers();
 
 // Configuración y registro del servicio de email
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
 builder.Services.AddScoped<IEmailService, EmailService>();
 
-// --- CONSTRUCCIÓN DE LA APLICACIÓN ---
 var app = builder.Build();
 
-// --- CONFIGURACIÓN DEL PIPELINE DE HTTP Y ENDPOINTS ---
-if (app.Environment.IsDevelopment()) {
-    app.MapOpenApi();
+// Swagger UI solo en desarrollo
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
-var summaries = new[] {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// Seed inicial de datos (categorías, proveedores, funkos, roles y usuarios por defecto)
+using (var scope = app.Services.CreateScope())
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("Seed");
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var mongo = scope.ServiceProvider.GetRequiredService<AppMongoDbContext>();
 
-app.MapGet("/weatherforecast", () => {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+        await db.Database.EnsureCreatedAsync();
+        await DbSeeder.SeedAsync(db, mongo, logger);
+        await UserRoleSeeder.SeedIdentityAsync(scope.ServiceProvider, logger);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "No se pudo inicializar la base de datos. Revisa la conexión a PostgreSQL/MongoDB.");
+    }
+}
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary) {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
