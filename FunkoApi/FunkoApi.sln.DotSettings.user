@@ -11,6 +11,9 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6ba80ca2_002D97c0_002D4b3a_002Db62b_002D5a3967f03671/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CasosCorrectos" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Project Location="C:\Users\nickr\Desktop\git\DWES-05-FunkoApi-Cooperativa\FunkoApi\FunkoApi.Tests" Presentation="&amp;lt;FunkoApi.Tests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=83993913_002Dce3b_002D4599_002D8bea_002D7e1f9877d54b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;FunkoApi.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="C:\Users\nickr\Desktop\git\DWES-05-FunkoApi-Cooperativa\FunkoApi\FunkoApi.Tests" Presentation="&amp;lt;FunkoApi.Tests&amp;gt;" /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=90dc0dd5_002D587d_002D4587_002D986b_002D9bdbf1eef73f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ToResponseDto_DeberiaMapearIdYNombre" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::E8201B43-8280-3D37-6F90-0B66C15B526B::net10.0::FunkoApi.Tests.Mappers.CategoriaMapperTest&lt;/TestId&gt;&#xD;

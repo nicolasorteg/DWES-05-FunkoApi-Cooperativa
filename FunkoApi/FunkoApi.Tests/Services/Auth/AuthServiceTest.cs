@@ -6,6 +6,7 @@ using FunkoApi.Dto.Auth;
 using FunkoApi.Errors.Auth;
 using FunkoApi.Models;
 using FunkoApi.Services.Auth;
+using FunkoApi.Services.Email;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,7 @@ public class AuthServiceTests
 {
     private Mock<UserManager<AppUser>> _userManagerMock = null!;
     private Mock<SignInManager<AppUser>> _signInManagerMock = null!;
+    private Mock<IEmailService> _emailServiceMock = null!;
     private AuthService _service = null!;
 
     [SetUp]
@@ -36,6 +38,8 @@ public class AuthServiceTests
             Mock.Of<ILogger<SignInManager<AppUser>>>(),
             Mock.Of<IAuthenticationSchemeProvider>(),
             Mock.Of<IUserConfirmation<AppUser>>());
+        
+        _emailServiceMock = new Mock<IEmailService>();
 
         var jwtOptions = Options.Create(new JwtOptions
         {
@@ -45,7 +49,7 @@ public class AuthServiceTests
             ExpirationMin = 60
         });
 
-        _service = new AuthService(_userManagerMock.Object, _signInManagerMock.Object, jwtOptions);
+        _service = new AuthService(_userManagerMock.Object, _signInManagerMock.Object, _emailServiceMock.Object,  jwtOptions);
     }
 
     [Test]

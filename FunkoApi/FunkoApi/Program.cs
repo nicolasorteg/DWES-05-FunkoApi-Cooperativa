@@ -15,8 +15,6 @@ builder.Services.AddAllDependencies(builder.Configuration, builder.Environment);
 builder.Services.AddControllers();
 
 // Configuración y registro del servicio de email
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
-builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSignalR();
 builder.Services.AddGraphQLConfiguration();
 

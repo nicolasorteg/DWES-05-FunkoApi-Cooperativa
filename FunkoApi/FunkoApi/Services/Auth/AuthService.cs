@@ -7,6 +7,7 @@ using FunkoApi.Errors.Auth;
 using FunkoApi.Configuration;
 using FunkoApi.Errors.Common;
 using FunkoApi.Models;
+using FunkoApi.Services.Email;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -16,6 +17,7 @@ namespace FunkoApi.Services.Auth;
 public class AuthService(
     UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
+    IEmailService emailService,
     IOptions<JwtOptions> jwtOptions) : IAuthService
 {
     public async Task<Result<AuthResponseDto, DomainError>> Login(LoginDto loginDto)
@@ -27,7 +29,12 @@ public class AuthService(
         var result = await signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
         if (!result.Succeeded)
             return Result.Failure<AuthResponseDto, DomainError>(new AuthError.Unauthorized());
-
+        
+        string subject = "Nuevo inicio de sesión detectado";
+        string htmlBody = $"<h3>Hola {user.UserName},</h3><p>Se ha detectado un nuevo inicio de sesión en tu cuenta de FunkoApi Store.</p><hr><small>Si no has sido tú, contacta con soporte.</small>";
+        
+        var emailResult = await emailService.SendEmailAsync(user.Email!, subject, htmlBody);
+        
         var roles = await userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? "USER";
 

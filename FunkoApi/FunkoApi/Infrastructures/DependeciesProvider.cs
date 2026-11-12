@@ -11,6 +11,7 @@ using FunkoApi.Services.Auth;
 using FunkoApi.Services.Background;
 using FunkoApi.Services.Cache;
 using FunkoApi.Services.Categoria;
+using FunkoApi.Services.Email;
 using FunkoApi.Services.Funkos;
 using FunkoApi.Services.Proveedor;
 using FunkoApi.Services.Proveedores;
@@ -36,7 +37,7 @@ public static class DependenciesProvider
         services.AddDatabaseConfiguration(configuration);
         services.AddIdentityAndSecurity(configuration);
         services.AddCacheConfiguration(configuration, environment);
-        services.AddApplicationServices();
+        services.AddApplicationServices(configuration);
         services.AddSwaggerDocumentation();
 
         return services;
@@ -143,7 +144,7 @@ public static class DependenciesProvider
     }
 
     // 4. Repositorios, Servicios y Validadores
-    private static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    private static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Repositorios
         services.AddScoped<ICategoriaRepository, CategoriaRepository>();
@@ -155,6 +156,9 @@ public static class DependenciesProvider
         services.AddScoped<IFunkoService, FunkoService>();
         services.AddScoped<IProveedorService, ProveedorService>();
         services.AddScoped<IAuthService, AuthService>();
+        
+        services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
+        services.AddScoped<IEmailService, EmailService>();
 
         // Validadores de FluentValidation
         services.AddValidatorsFromAssemblyContaining<CategoriaService>();
