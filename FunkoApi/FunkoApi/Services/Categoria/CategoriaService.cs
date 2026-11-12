@@ -95,6 +95,7 @@ public class CategoriaService (
 
         // mapear y actualizar
         var entityToUpdate = dto.UpdateEntity();
+        entityToUpdate.Id = id; 
         var actualizado = await categoriaRepository.UpdateAsync(entityToUpdate);
         if (actualizado == null)
             return Result.Failure<ResponseCategoriaDto, DomainError>(ModelErrors.NotFound(id));
