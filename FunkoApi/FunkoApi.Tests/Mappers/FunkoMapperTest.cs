@@ -84,7 +84,7 @@ public class FunkoMapperTest {
             var res = _funko.ToResponseDto(_proveedor);
 
             // assert
-            res.Imagen.Should().Be("/images/default-funko.png");
+            res.Imagen.Should().Be("/uploads/images/default-funko.png");
         }
 
         [Test]
