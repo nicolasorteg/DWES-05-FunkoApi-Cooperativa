@@ -2,11 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><!DOCTYPE html>
-        <html lang="es">
-        <head>
-        <meta charset="UTF-8">
-        <title>Prueba de SignalR - FunkoApi</title>
+    <title>Prueba de SignalR - FunkoApi</title>
     <!-- Carga de la librería cliente oficial de SignalR desde CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
     <style>
@@ -77,7 +73,12 @@
             log(`✨ [NUEVO FUNKO]: ${funko.nombre} - ${funko.precio}€`, "log-funko");
         });
 
-        // 3. Escuchar cuando se borra un Funko
+        // 3. Escuchar cuando se actualiza un Funko (¡FALTABA ESTE!)
+        connection.on("FunkoActualizado", (funko) => {
+            log(`🔄 [FUNKO ACTUALIZADO]: ${funko.nombre} - ${funko.precio}€`, "log-funko");
+        });
+
+        // 4. Escuchar cuando se borra un Funko
         connection.on("FunkoEliminado", (id) => {
             log(`🗑️ [FUNKO ELIMINADO]: ID ${id}`, "log-error");
         });
@@ -90,11 +91,3 @@
         }
     }
 </script>
-
-</body>
-</html></title>
-</head>
-<body>
-
-</body>
-</html>
