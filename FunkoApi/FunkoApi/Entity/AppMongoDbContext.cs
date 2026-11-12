@@ -4,8 +4,14 @@ using MongoDB.EntityFrameworkCore.Extensions;
 
 namespace FunkoApi.Entity;
 
-public class AppMongoDbContext(DbContextOptions<AppMongoDbContext> options) : DbContext(options) {
+public class AppMongoDbContext : DbContext{
 
+    public AppMongoDbContext(DbContextOptions<AppMongoDbContext> options) : base(options)
+    {
+        // Evita fallos con transacciones (MongoDB local sin replica set)
+        Database.AutoTransactionBehavior = AutoTransactionBehavior.Never;
+    }
+    
     public DbSet<Proveedor> Proveedores => Set<Proveedor>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {

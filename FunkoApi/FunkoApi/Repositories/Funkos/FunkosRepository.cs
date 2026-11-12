@@ -25,6 +25,7 @@ public sealed class FunkosRepository(AppDbContext context) : IFunkosRepository
 
         return await context.Funkos
             .AsNoTracking()
+            .Include(f => f.Categoria)
             .Where(f => !f.IsDeleted)
             .OrderBy(f => f.Nombre)
             .ThenBy(f => f.Id)          // desempate estable entre páginas
@@ -36,6 +37,7 @@ public sealed class FunkosRepository(AppDbContext context) : IFunkosRepository
     public async Task<Funko?> GetByIdAsync(long id) =>
         await context.Funkos
             .AsNoTracking()
+            .Include(f => f.Categoria)
             .FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
 
     public async Task<Funko> AddAsync(Funko entity)

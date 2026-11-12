@@ -1,10 +1,13 @@
-﻿using FunkoApi.IdGenerators;
+using FunkoApi.IdGenerators;
 using FunkoApi.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FunkoApi.Entity;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options) {
+public class AppDbContext(DbContextOptions<AppDbContext> options)
+    : IdentityDbContext<AppUser, IdentityRole<long>, long>(options) {
     
     public DbSet<Categoria> Categorias { get; set; } = null!;
     public DbSet<Funko> Funkos { get; set; } = null!;
